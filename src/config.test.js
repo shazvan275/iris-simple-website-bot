@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import demoConfig from "../demo/iris.config.js";
 import { normalizeIrisConfig, normalizeMarkdownFiles } from "./config.js";
 
 test("normalizeIrisConfig uses OpenAI defaults when no config is supplied", () => {
@@ -108,4 +109,8 @@ test("normalizeMarkdownFiles rejects non-public URL schemes and credentialed URL
     ),
     ["/public/readme.md"]
   );
+});
+
+test("demo config does not ship a provider API key", () => {
+  assert.equal(demoConfig.apiKey, "");
 });

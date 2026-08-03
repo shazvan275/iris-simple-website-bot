@@ -33,8 +33,8 @@ Create a config file in your app and pass it into the assistant when you mount i
 // iris.config.js
 const irisConfig = {
   provider: "openai", // "claude", "openai", "openrouter", or "selfhosted"
-  apiKey: import.meta.env.VITE_IRIS_API_KEY,
-  baseUrl: "https://api.openai.com/v1",
+  apiKey: "",
+  baseUrl: "/api/iris/v1",
   model: "gpt-4.1-mini",
   temperature: 0.7,
   maxTokens: 1024,
@@ -66,6 +66,21 @@ Iris reads this config at initialization. It does not render a settings panel or
 Because Iris runs in the browser, any `apiKey` bundled into client code is visible to site visitors. For production third-party providers, use a same-origin backend/proxy or a self-hosted OpenAI-compatible endpoint instead of exposing a provider secret in `VITE_` environment variables.
 
 For OpenRouter, set `provider: "openrouter"`, use `baseUrl: "https://openrouter.ai/api/v1"`, and pass the key through `VITE_IRIS_API_KEY` only for local demos.
+
+## Production proxy
+
+For production, keep the provider key on your server and point Iris at a same-origin OpenAI-compatible endpoint:
+
+```js
+const irisConfig = {
+  provider: "openai",
+  apiKey: "",
+  baseUrl: "/api/iris/v1",
+  model: "gpt-4.1-mini"
+};
+```
+
+Your backend should receive `/api/iris/v1/chat/completions`, add the provider `Authorization` header from a server-only environment variable, and forward the request to the provider. Do not blindly expose a raw proxy: validate the request, enforce allowed models, cap `max_tokens`, add rate limits, and log abuse-safe metadata only.
 
 ## Markdown RAG
 
