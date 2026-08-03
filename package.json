@@ -1,0 +1,30 @@
+{
+  "name": "iris",
+  "version": "0.1.0",
+  "description": "Floating Iris assistant component for React apps.",
+  "type": "module",
+  "main": "./dist/iris.js",
+  "module": "./dist/iris.js",
+  "exports": {
+    ".": "./dist/iris.js",
+    "./style.css": "./dist/iris.css"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "test": "node --test src/*.test.js"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "vite": "^6.0.7",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}
