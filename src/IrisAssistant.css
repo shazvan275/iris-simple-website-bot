@@ -218,6 +218,18 @@
   transform: scaleY(0.72) rotate(-10deg);
 }
 
+.iris-eye-button.is-idle-wink .iris-lid-top {
+  height: calc(var(--iris-eye-size) * 0.72);
+}
+
+.iris-eye-button.is-idle-hide .iris-sphere {
+  opacity: 0.78;
+}
+
+.iris-eye-button.is-idle-focus .iris-pupil {
+  transform: scale(1.16);
+}
+
 .iris-eyebrow {
   position: absolute;
   top: var(--iris-brow-y);
@@ -709,6 +721,144 @@
   0% { opacity: 0; transform: translateY(-5px) rotate(12deg) scale(0.7); }
   28% { opacity: 0.95; }
   100% { opacity: 0; transform: translateY(calc(var(--iris-eye-size) * 0.25)) rotate(12deg) scale(1); }
+}
+
+@keyframes iris-assistant-curious {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-4px) rotate(7deg) scale(1.03); }
+}
+
+@keyframes iris-assistant-wink {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  45% { transform: translateY(-3px) rotate(-5deg) scale(1.04, 0.96); }
+}
+
+@keyframes iris-assistant-look-around {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-7px) rotate(-5deg); }
+  55% { transform: translateX(7px) rotate(5deg); }
+  80% { transform: translateX(-3px) rotate(-2deg); }
+}
+
+@keyframes iris-assistant-peek {
+  0%, 100% { transform: translateX(0) scale(1); }
+  45% { transform: translateX(-13px) scale(0.96, 1.04); }
+}
+
+@keyframes iris-assistant-spin {
+  0% { transform: rotate(0deg) scale(1); }
+  55% { transform: rotate(360deg) scale(1.06); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes iris-assistant-wave {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  20% { transform: rotate(-12deg) translateY(-3px); }
+  40% { transform: rotate(12deg) translateY(-5px); }
+  60% { transform: rotate(-9deg) translateY(-3px); }
+  80% { transform: rotate(8deg) translateY(-1px); }
+}
+
+@keyframes iris-assistant-nod {
+  0%, 100% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(6px) scale(1.03, 0.94); }
+  70% { transform: translateY(-4px) scale(0.98, 1.04); }
+}
+
+@keyframes iris-assistant-shake-head {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-6px) rotate(-7deg); }
+  75% { transform: translateX(6px) rotate(7deg); }
+}
+
+@keyframes iris-assistant-excited {
+  0%, 100% { transform: translateY(0) scale(1); }
+  35% { transform: translateY(-12px) scale(1.08, 0.92); }
+  65% { transform: translateY(1px) scale(0.96, 1.05); }
+}
+
+@keyframes iris-assistant-surprised {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-7px) scale(1.14); }
+  75% { transform: translateY(2px) scale(0.98); }
+}
+
+@keyframes iris-assistant-shy {
+  0%, 100% { transform: translateY(2px) rotate(-8deg) scale(0.98); }
+  50% { transform: translateY(5px) rotate(6deg) scale(0.95, 1.03); }
+}
+
+@keyframes iris-assistant-sleepy {
+  0%, 100% { transform: translateY(3px) rotate(-2deg); }
+  50% { transform: translateY(7px) rotate(2deg) scale(0.98, 1.02); }
+}
+
+@keyframes iris-assistant-celebrate {
+  0%, 100% { transform: translateY(0) rotate(0) scale(1); }
+  25% { transform: translateY(-10px) rotate(-10deg) scale(1.08, 0.94); }
+  50% { transform: translateY(-3px) rotate(9deg) scale(0.97, 1.05); }
+  75% { transform: translateY(-12px) rotate(4deg) scale(1.06, 0.94); }
+}
+
+@keyframes iris-assistant-stretch {
+  0%, 100% { transform: scale(1) translateY(0); }
+  35% { transform: scale(1.16, 0.84) translateY(4px); }
+  70% { transform: scale(0.9, 1.16) translateY(-5px); }
+}
+
+@keyframes iris-assistant-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  45% { transform: translateY(-14px) scale(0.96, 1.08); }
+  75% { transform: translateY(2px) scale(1.05, 0.95); }
+}
+
+@keyframes iris-assistant-hide {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+  50% { transform: translateY(14px) scale(0.88); opacity: 0.7; }
+}
+
+@keyframes iris-assistant-peekaboo {
+  0%, 100% { transform: translateY(10px) scale(0.9); }
+  45% { transform: translateY(-4px) scale(1.05); }
+  70% { transform: translateY(0) scale(1); }
+}
+
+@keyframes iris-assistant-confused {
+  0%, 100% { transform: rotate(-6deg) translateY(0); }
+  50% { transform: rotate(8deg) translateY(-3px); }
+}
+
+@keyframes iris-assistant-thinking {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-3px) rotate(-5deg); }
+}
+
+@keyframes iris-assistant-scan {
+  0%, 100% { transform: translateX(-8px) rotate(-4deg); }
+  50% { transform: translateX(8px) rotate(4deg); }
+}
+
+@keyframes iris-assistant-listen {
+  0%, 100% { transform: translateX(0) rotate(-4deg); }
+  50% { transform: translateX(-5px) rotate(-10deg) scale(1.03); }
+}
+
+@keyframes iris-assistant-focus {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes iris-assistant-typing {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(2px) rotate(-2deg); }
+}
+
+@keyframes iris-assistant-impatient {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-3px) rotate(-3deg); }
+  40% { transform: translateX(3px) rotate(3deg); }
+  60% { transform: translateX(-2px) rotate(-2deg); }
+  80% { transform: translateX(2px) rotate(2deg); }
 }
 
 @media (max-width: 640px) {
