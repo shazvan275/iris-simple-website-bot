@@ -1,5 +1,5 @@
 {
-  "name": "iris",
+  "name": "iris-simple-website-bot",
   "version": "0.1.0",
   "description": "Floating Iris assistant component for React apps.",
   "type": "module",
@@ -7,12 +7,15 @@
   "module": "./dist/iris.js",
   "exports": {
     ".": "./dist/iris.js",
-    "./style.css": "./dist/iris.css"
+    "./style.css": "./dist/iris-simple-website-bot.css"
   },
   "files": [
     "dist",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
