@@ -1,6 +1,6 @@
 {
   "name": "iris-simple-website-bot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Floating Iris assistant component for React apps.",
   "type": "module",
   "main": "./dist/iris.js",
