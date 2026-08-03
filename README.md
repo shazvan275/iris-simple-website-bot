@@ -7,6 +7,8 @@ site as a single component. It gives teams a friendly floating assistant for
 visitor questions, event support, product FAQs, and content-aware answers backed
 by public markdown files.
 
+![Iris assistant chat screenshot](assets/iris-assistant-screenshot.png)
+
 ## Table of Contents
 
 - [Who This README Is For](#who-this-readme-is-for)
