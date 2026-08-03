@@ -7,7 +7,7 @@ site as a single component. It gives teams a friendly floating assistant for
 visitor questions, event support, product FAQs, and content-aware answers backed
 by public markdown files.
 
-![Iris assistant chat screenshot](assets/iris-assistant-screenshot.png)
+![Iris assistant chat screenshot](https://raw.githubusercontent.com/shazvan275/iris-simple-website-bot/refs/heads/main/assets/iris-assistant-screenshot.png)
 
 ## Table of Contents
 
