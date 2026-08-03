@@ -96,6 +96,21 @@ test("retrieveMarkdownChunks returns chunks relevant to the question", () => {
   assert.match(matches[0].text, /Basic plan costs \$9/);
 });
 
+test("retrieveMarkdownChunks matches plain queries to hyphenated markdown terms", () => {
+  const chunks = chunkMarkdownDocuments([
+    {
+      url: "/docs/event.md",
+      text: "# Attendee Help\nWi-Fi details are available at the registration counter."
+    }
+  ]);
+
+  const matches = retrieveMarkdownChunks("tell me about wifi", chunks, 1);
+
+  assert.equal(matches.length, 1);
+  assert.equal(matches[0].url, "/docs/event.md");
+  assert.match(matches[0].text, /Wi-Fi details/);
+});
+
 test("retrieveMarkdownChunks returns no chunks when the question has no markdown match", () => {
   const chunks = chunkMarkdownDocuments([
     {

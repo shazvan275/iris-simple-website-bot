@@ -7,7 +7,7 @@ const irisConfig = {
   maxTokens: 1024,
   name: "Iris",
   introText: "Hi! Am Iris, your AI assistant. How can I help you today?",
-  markdownFiles: "",
+  markdownFiles: "/demo/dummy.md",
   tiles: [
     { label: "Ask a question", message: "I have a question about the event." },
     { label: "Event schedule", message: "What’s on the schedule today?" },

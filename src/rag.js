@@ -186,9 +186,13 @@ function normalizeToken(token) {
 }
 
 function tokenize(value) {
-  const tokens = String(value || "").match(/[a-z0-9]+/gi) || [];
+  const tokens = String(value || "").match(/[a-z0-9]+(?:[-'][a-z0-9]+)*/gi) || [];
 
   return tokens
+    .flatMap((token) => {
+      const parts = token.toLowerCase().split(/[-']+/).filter(Boolean);
+      return parts.length > 1 ? [parts.join(""), ...parts] : parts;
+    })
     .map(normalizeToken)
     .filter((token) => token.length > 2 && !STOP_WORDS.has(token));
 }
