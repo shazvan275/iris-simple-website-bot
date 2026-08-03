@@ -1,5 +1,5 @@
 export const MARKDOWN_UNAVAILABLE_REPLY =
-  "I don't have that information in the configured markdown files.";
+  "I don't have that information available right now.";
 
 const DEFAULT_CHUNK_CHARACTER_LIMIT = 1400;
 const DEFAULT_RETRIEVAL_LIMIT = 4;

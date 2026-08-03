@@ -11,6 +11,13 @@ import {
   retrieveMarkdownChunks
 } from "./rag.js";
 
+test("MARKDOWN_UNAVAILABLE_REPLY is friendly and does not mention markdown files", () => {
+  assert.equal(
+    MARKDOWN_UNAVAILABLE_REPLY,
+    "I don't have that information available right now."
+  );
+});
+
 test("isMarkdownUrl only accepts URL pathnames ending in .md", () => {
   assert.equal(isMarkdownUrl("/docs/about.md"), true);
   assert.equal(isMarkdownUrl("https://example.com/help.md?cache=1"), true);
