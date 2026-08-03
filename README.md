@@ -12,6 +12,7 @@ by public markdown files.
 ## Table of Contents
 
 - [Who This README Is For](#who-this-readme-is-for)
+- [Links](#links)
 - [Product Summary](#product-summary)
 - [Key Capabilities](#key-capabilities)
 - [Marketing Guide](#marketing-guide)
@@ -34,6 +35,11 @@ This project has two audiences:
 - Developers integrating, customizing, testing, and publishing the React package.
 - Marketing, product, and event teams deciding how Iris should be positioned,
   configured, and launched on a public website.
+
+## Links
+
+- GitHub: [shazvan275/iris-simple-website-bot](https://github.com/shazvan275/iris-simple-website-bot)
+- npm: [iris-simple-website-bot](https://www.npmjs.com/package/iris-simple-website-bot)
 
 ## Product Summary
 
