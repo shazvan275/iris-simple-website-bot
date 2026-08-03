@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { normalizeIrisConfig } from "./config.js";
 import {
+  NEUTRAL_IDLE_STATE,
+  buildIdleActionState,
+  pickIdleAction
+} from "./idleActions.js";
+import {
   chunkMarkdownDocuments,
   createMarkdownRagReply,
   loadMarkdownDocuments
@@ -29,6 +34,8 @@ const INITIAL_STATE = {
   blinkAmount: 0,
   introDone: false,
   animCue: null,
+  idleAnimation: null,
+  idleClassName: "",
   facing: 1
 };
 
@@ -141,25 +148,73 @@ export function IrisAssistant({ config } = {}) {
     clearTimeout(sleepTimerRef.current);
   }, []);
 
+  const resetIdleActionTargets = useCallback(() => {
+    targetRef.current = { x: 0, y: 0 };
+    leanTargetRef.current = { x: 0, y: 0 };
+  }, []);
+
+  const resetIdleAction = useCallback((phase) => {
+    if (stateRef.current.phase !== phase) return;
+    resetIdleActionTargets();
+    updateAssistant(NEUTRAL_IDLE_STATE);
+  }, [resetIdleActionTargets, updateAssistant]);
+
+  const runIdleAction = useCallback((action) => {
+    clearTimeout(activityEndTimerRef.current);
+    clearTimeout(jumpEndTimerRef.current);
+
+    targetRef.current = action.target || { x: 0, y: 0 };
+    leanTargetRef.current = action.lean || { x: 0, y: 0 };
+    updateAssistant(buildIdleActionState(action));
+
+    activityEndTimerRef.current = window.setTimeout(() => {
+      if (stateRef.current.phase !== action.phase) return;
+
+      if (action.followUp) {
+        const followUp = {
+          id: `${action.id}-follow-up`,
+          phase: `${action.phase}-follow-up`,
+          mood: "neutral",
+          bubbleText: null,
+          target: { x: 0, y: 0 },
+          lean: { x: 0, y: 0 },
+          dancing: false,
+          angry: false,
+          ...action.followUp
+        };
+        targetRef.current = followUp.target;
+        leanTargetRef.current = followUp.lean;
+        updateAssistant(buildIdleActionState(followUp));
+        jumpEndTimerRef.current = window.setTimeout(() => {
+          resetIdleAction(followUp.phase);
+        }, followUp.duration);
+        return;
+      }
+
+      resetIdleAction(action.phase);
+    }, action.duration);
+  }, [resetIdleAction, updateAssistant]);
+
   const scheduleSleep = useCallback(() => {
     clearTimeout(sleepTimerRef.current);
     sleepTimerRef.current = window.setTimeout(() => {
       const current = stateRef.current;
       if (current.hovering || current.showPopup) return;
 
-      targetRef.current = { x: 0, y: 0 };
-      leanTargetRef.current = { x: 0, y: 0 };
+      resetIdleActionTargets();
       updateAssistant({
         phase: "sleeping",
         dancing: false,
         angry: false,
         mood: "neutral",
         animCue: null,
+        idleAnimation: null,
+        idleClassName: "",
         blinkAmount: 1,
         bubbleText: "Zzz…"
       });
     }, INACTIVITY_TIMEOUT);
-  }, [updateAssistant]);
+  }, [resetIdleActionTargets, updateAssistant]);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 640px)");
@@ -271,7 +326,7 @@ export function IrisAssistant({ config } = {}) {
   useEffect(() => {
     const timers = [];
 
-    updateAssistant({ phase: "intro", animCue: "hop" });
+    updateAssistant({ phase: "intro", animCue: "hop", idleAnimation: null, idleClassName: "" });
     timers.push(
       window.setTimeout(() => {
         targetRef.current = { x: -0.5, y: -0.2 };
@@ -284,7 +339,7 @@ export function IrisAssistant({ config } = {}) {
       }, 1200),
       window.setTimeout(() => updateAssistant({ bubbleText: "Hi.." }), 900),
       window.setTimeout(() => {
-        updateAssistant({ bubbleText: null, phase: "idle", introDone: true, animCue: null });
+        updateAssistant({ ...NEUTRAL_IDLE_STATE, introDone: true });
       }, 2600)
     );
 
@@ -319,83 +374,7 @@ export function IrisAssistant({ config } = {}) {
           !current.hovering &&
           current.phase !== "sleeping";
 
-        if (canAnimate) {
-          const randomAction = Math.floor(Math.random() * 4);
-
-          if (randomAction === 0) {
-            updateAssistant({
-              phase: "random-dance",
-              dancing: true,
-              angry: false,
-              mood: "neutral",
-              bubbleText: "Woo!"
-            });
-            activityEndTimerRef.current = window.setTimeout(() => {
-              if (stateRef.current.phase !== "random-dance") return;
-              updateAssistant({
-                phase: "random-jump",
-                dancing: false,
-                bubbleText: null,
-                animCue: "jump"
-              });
-              jumpEndTimerRef.current = window.setTimeout(() => {
-                if (stateRef.current.phase === "random-jump") {
-                  updateAssistant({ phase: "idle", animCue: null });
-                }
-              }, 900);
-            }, 5000);
-          } else if (randomAction === 1) {
-            targetRef.current = { x: -0.15, y: 0.7 };
-            updateAssistant({
-              phase: "random-sad",
-              dancing: false,
-              angry: false,
-              mood: "sad",
-              bubbleText: "Aww…",
-              animCue: null
-            });
-            activityEndTimerRef.current = window.setTimeout(() => {
-              if (stateRef.current.phase !== "random-sad") return;
-              targetRef.current = { x: 0, y: 0 };
-              updateAssistant({ phase: "idle", mood: "neutral", bubbleText: null });
-            }, 4500);
-          } else if (randomAction === 2) {
-            targetRef.current = { x: 0.15, y: -0.15 };
-            updateAssistant({
-              phase: "random-angry",
-              dancing: false,
-              angry: true,
-              mood: "angry",
-              bubbleText: "Grr!",
-              animCue: null
-            });
-            activityEndTimerRef.current = window.setTimeout(() => {
-              if (stateRef.current.phase !== "random-angry") return;
-              targetRef.current = { x: 0, y: 0 };
-              updateAssistant({
-                phase: "idle",
-                angry: false,
-                mood: "neutral",
-                bubbleText: null
-              });
-            }, 4000);
-          } else {
-            targetRef.current = { x: 0.85, y: -0.3 };
-            updateAssistant({
-              phase: "random-naughty",
-              dancing: false,
-              angry: false,
-              mood: "naughty",
-              bubbleText: "Hehe…",
-              animCue: null
-            });
-            activityEndTimerRef.current = window.setTimeout(() => {
-              if (stateRef.current.phase !== "random-naughty") return;
-              targetRef.current = { x: 0, y: 0 };
-              updateAssistant({ phase: "idle", mood: "neutral", bubbleText: null });
-            }, 5000);
-          }
-        }
+        if (canAnimate) runIdleAction(pickIdleAction());
 
         scheduleRandomActivity();
       }, 12_000 + Math.random() * 12_000);
@@ -407,7 +386,7 @@ export function IrisAssistant({ config } = {}) {
       clearTimeout(activityEndTimerRef.current);
       clearTimeout(jumpEndTimerRef.current);
     };
-  }, [updateAssistant]);
+  }, [runIdleAction]);
 
   useEffect(() => {
     scheduleSleep();
@@ -457,11 +436,11 @@ export function IrisAssistant({ config } = {}) {
   }, []);
 
   const closePopup = useCallback(() => {
-    updateAssistant({ showPopup: false, phase: "idle", pressed: false, animCue: null });
-    leanTargetRef.current = { x: 0, y: 0 };
+    updateAssistant({ ...NEUTRAL_IDLE_STATE, showPopup: false, pressed: false });
+    resetIdleActionTargets();
     scheduleSleep();
     window.setTimeout(() => eyeRef.current?.focus(), 0);
-  }, [scheduleSleep, updateAssistant]);
+  }, [resetIdleActionTargets, scheduleSleep, updateAssistant]);
 
   const openPopup = useCallback(() => {
     clearSleepTimer();
@@ -474,6 +453,8 @@ export function IrisAssistant({ config } = {}) {
       pressed: true,
       bubbleText: null,
       animCue: "press",
+      idleAnimation: null,
+      idleClassName: "",
       dancing: false,
       angry: false,
       mood: "neutral",
@@ -505,6 +486,8 @@ export function IrisAssistant({ config } = {}) {
       mood: "neutral",
       animCue: null,
       blinkAmount: 0,
+      idleAnimation: null,
+      idleClassName: "",
       bubbleText: null
     });
     posXTargetRef.current = motion.posX;
@@ -520,7 +503,9 @@ export function IrisAssistant({ config } = {}) {
       hovering: false,
       dancing: false,
       angry: false,
-      mood: "neutral"
+      mood: "neutral",
+      idleAnimation: null,
+      idleClassName: ""
     });
     clearTimeout(angryTimerRef.current);
     if (!stateRef.current.showPopup) scheduleSleep();
@@ -531,7 +516,9 @@ export function IrisAssistant({ config } = {}) {
     updateAssistant((current) => ({
       phase: current.phase === "sleeping" ? "idle" : current.phase,
       blinkAmount: 0,
-      bubbleText: current.phase === "sleeping" ? null : current.bubbleText
+      bubbleText: current.phase === "sleeping" ? null : current.bubbleText,
+      idleAnimation: current.phase === "sleeping" ? null : current.idleAnimation,
+      idleClassName: current.phase === "sleeping" ? "" : current.idleClassName
     }));
     if (!stateRef.current.showPopup) scheduleSleep();
   };
@@ -562,7 +549,9 @@ export function IrisAssistant({ config } = {}) {
       isThinking: true,
       phase: "thinking",
       longWaitText: null,
-      hasError: false
+      hasError: false,
+      idleAnimation: null,
+      idleClassName: ""
     });
     clearReplyTimers();
 
@@ -589,7 +578,9 @@ export function IrisAssistant({ config } = {}) {
         ],
         isThinking: false,
         longWaitText: null,
-        phase: "success"
+        phase: "success",
+        idleAnimation: null,
+        idleClassName: ""
       }));
       doBlink(80, 50, 80);
       reactionTimerRef.current = window.setTimeout(() => {
@@ -604,7 +595,9 @@ export function IrisAssistant({ config } = {}) {
         longWaitText: null,
         hasError: true,
         lastFailedText: text,
-        phase: "error"
+        phase: "error",
+        idleAnimation: null,
+        idleClassName: ""
       });
       leanTargetRef.current = { x: -0.15, y: 0 };
       reactionTimerRef.current = window.setTimeout(() => {
@@ -683,20 +676,28 @@ export function IrisAssistant({ config } = {}) {
       : 0;
 
   let characterAnimation = "none";
-  if (assistant.angry) characterAnimation = "iris-assistant-error-shake 0.25s ease-in-out infinite";
-  else if (assistant.dancing) characterAnimation = "iris-assistant-dance 0.55s ease-in-out infinite";
-  else if (assistant.mood === "sad") characterAnimation = "iris-assistant-sad 1.8s ease-in-out infinite";
-  else if (assistant.mood === "naughty") characterAnimation = "iris-assistant-naughty 0.7s ease-in-out infinite";
-  else if (assistant.animCue === "hop") {
+  if (assistant.phase === "success") {
+    characterAnimation = "iris-assistant-success 0.6s cubic-bezier(.34,1.56,.64,1) both";
+  } else if (assistant.phase === "error") {
+    characterAnimation = "iris-assistant-error-shake 0.4s cubic-bezier(.34,1.56,.64,1) both";
+  } else if (assistant.idleAnimation) {
+    characterAnimation = assistant.idleAnimation;
+  } else if (assistant.angry) {
+    characterAnimation = "iris-assistant-error-shake 0.25s ease-in-out infinite";
+  } else if (assistant.dancing) {
+    characterAnimation = "iris-assistant-dance 0.55s ease-in-out infinite";
+  } else if (assistant.mood === "sad") {
+    characterAnimation = "iris-assistant-sad 1.8s ease-in-out infinite";
+  } else if (assistant.mood === "naughty") {
+    characterAnimation = "iris-assistant-naughty 0.7s ease-in-out infinite";
+  } else if (assistant.mood === "sleepy") {
+    characterAnimation = "iris-assistant-sleepy 2s ease-in-out infinite";
+  } else if (assistant.animCue === "hop") {
     characterAnimation = "iris-assistant-hop 0.9s cubic-bezier(.34,1.56,.64,1) both";
   } else if (assistant.animCue === "press") {
     characterAnimation = "iris-assistant-press 0.4s cubic-bezier(.34,1.56,.64,1) both";
   } else if (assistant.animCue === "jump") {
     characterAnimation = "iris-assistant-jump 0.9s cubic-bezier(.34,1.56,.64,1) both";
-  } else if (assistant.phase === "success") {
-    characterAnimation = "iris-assistant-success 0.6s cubic-bezier(.34,1.56,.64,1) both";
-  } else if (assistant.phase === "error") {
-    characterAnimation = "iris-assistant-error-shake 0.4s cubic-bezier(.34,1.56,.64,1) both";
   } else if (!reducedMotion && assistant.introDone && assistant.phase !== "sleeping") {
     characterAnimation = "iris-assistant-idle 4.5s ease-in-out infinite";
   }
@@ -855,7 +856,7 @@ export function IrisAssistant({ config } = {}) {
         <button
           ref={eyeRef}
           type="button"
-          className="iris-eye-button"
+          className={`iris-eye-button ${assistant.idleClassName}`.trim()}
           aria-label={assistant.showPopup ? "Close AI chat assistant" : "Open AI chat assistant"}
           aria-expanded={assistant.showPopup}
           aria-controls="iris-chat-popup"

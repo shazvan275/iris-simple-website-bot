@@ -92,3 +92,11 @@ test("neutral idle state does not overwrite chat messages or popup state", () =>
     idleClassName: ""
   });
 });
+
+test("idle action state names do not use real chat phases", () => {
+  for (const action of IDLE_ACTIONS) {
+    assert.notEqual(action.phase, "thinking");
+    assert.notEqual(action.phase, "success");
+    assert.notEqual(action.phase, "error");
+  }
+});
